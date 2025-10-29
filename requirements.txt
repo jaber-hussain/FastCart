@@ -72,7 +72,7 @@ maxminddb==2.4.0
 moviepy==1.0.3
 msal==1.30.0
 msgpack==1.0.7
-numpy==1.26.0
+numpy>=2.1.0
 oauthlib==3.2.2
 packaging==23.2
 pandas==2.1.1

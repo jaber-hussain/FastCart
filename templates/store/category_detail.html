@@ -1,0 +1,123 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<style>
+:root {
+    --accent: #00f5d4;
+    --accent-dark: #00b894;
+    --bg-dark: #f8f9fa;
+    --card-bg: #fff;
+    --radius: 12px;
+}
+body { background-color: var(--bg-dark); }
+.product_grid { transition: transform .3s; }
+.product_grid:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.btn-accent {
+    background: var(--accent);
+    color: #000;
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 6px 22px;
+    transition: background .3s;
+}
+.btn-accent:hover { background: var(--accent-dark); color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="middle">
+    <div class="container">
+        <h2 class="fw-bold mb-4">{{ category.title }} ({{ products|length }} Products)</h2>
+
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="border rounded p-3 mb-3">
+                    <h4>Categories</h4>
+                    {% for c in category_ %}
+                        <div class="form-check mb-1 d-flex justify-content-between align-items-center">
+                            <div>
+                                <input type="checkbox" class="form-check-input category-filter" value="{{ c.id }}" id="cat{{ c.id }}">
+                                <label class="form-check-label" for="cat{{ c.id }}">
+                                    <a href="{% url 'store:category_detail' c.slug %}">{{ c.title }}</a>
+                                </label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Products -->
+            <div class="col-lg-9">
+                <div class="row g-4" id="products-list">
+                    {% for p in products %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="product_grid card rounded-3 shadow-sm p-2">
+                            <div class="card-body p-0">
+                                <!-- Product Image Link -->
+                                <a href="{% url 'store:product_detail' p.slug %}">
+                                    <img src="{{ p.image.url }}" alt="{{ p.name }}" class="card-img-top" style="height: 230px; object-fit: cover;">
+                                </a>
+                            </div>
+
+                            <div class="card-footer p-2 bg-white d-flex flex-column align-items-start">
+                                <!-- Category Link -->
+                                <small class="text-muted mb-1">
+                                    {% if p.category %}
+                                        <a href="{% url 'store:category_detail' p.category.slug %}">{{ p.category.title }}</a>
+                                    {% else %}
+                                        <span>No Category</span>
+                                    {% endif %}
+                                </small>
+
+                                <!-- Product Title Link -->
+                                <h5 class="fs-md mb-1">
+                                    <a href="{% url 'store:product_detail' p.slug %}">{{ p.name|truncatechars:30 }}</a>
+                                </h5>
+
+                                <!-- Star Rating -->
+                                <div class="star-rating d-flex mb-2">
+                                    {% for i in "12345"|make_list %}
+                                        {% if p.average_rating|default:0 >= i|add:0 %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="fas fa-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Price -->
+                                <span class="fw-bold mb-2">${{ p.price }}</span>
+
+                                <!-- Actions -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- Add to cart (AJAX or link) -->
+                                    <button class="btn btn-sm btn-accent add_to_cart" data-id="{{ p.id }}">Add to cart</button>
+
+                                    <!-- Wishlist -->
+                                    {% if user.is_authenticated %}
+                                        <a href="#" class="add_to_wishlist {% if p in user.wishlist_products.all %}active{% endif %}" data-product_id="{{ p.id }}">
+                                            <i class="fas fa-heart {% if p in user.wishlist_products.all %}text-danger{% else %}text-dark{% endif %}"></i>
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'userauths:login' %}">
+                                            <i class="fas fa-heart text-dark"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <div class="col-12 text-center">
+                            <p class="text-muted">No products in this category yet.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

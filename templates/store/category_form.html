@@ -1,0 +1,16 @@
+{% extends "vendor/base.html" %}
+{% block content %}
+  <h2>{% if category %}Edit{% else %}Create{% endif %} Category</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label>Title</label>
+      <input type="text" name="title" class="form-control" value="{{ category.title|default:'' }}" required>
+    </div>
+    <div class="mb-3">
+      <label>Image</label>
+      <input type="file" name="image" class="form-control" {% if not category %}required{% endif %}>
+    </div>
+    <button class="btn btn-primary">Save</button>
+  </form>
+{% endblock %}

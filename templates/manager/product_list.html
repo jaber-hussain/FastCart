@@ -1,0 +1,46 @@
+{% extends 'manager/base.html' %}
+{% block title %}Products{% endblock %}
+{% block bc %}
+  <li class="breadcrumb-item"><a href="{% url 'manager:manage_products' %}">Products</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong>All Products</strong>
+    <a href="{% url 'manager:edit_product' 0 %}" class="btn btn-sm btn-primary">
+      <i class="bi bi-plus-lg"></i> Add Product
+    </a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th><input type="checkbox" class="form-check-input" id="checkAll"></th>
+          <th>Image</th><th>Name</th><th>Vendor</th><th>Price</th><th>Stock</th><th>Status</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td><input type="checkbox" class="form-check-input row-check" value="{{ p.id }}"></td>
+          <td><img src="{{ p.image.url }}" alt="" class="rounded" width="40" height="40"></td>
+          <td><a href="{% url 'manager:edit_product' p.id %}" class="text-decoration-none">{{ p.name }}</a></td>
+          <td>{{ p.vendor.profile.full_name|default:"—" }}</td>
+          <td>${{ p.price }}</td>
+          <td>{{ p.stock }}</td>
+          <td><span class="badge bg-{{ p.status|yesno:'success,secondary' }}">{{ p.status }}</span></td>
+          <td>
+            <a href="{% url 'manager:edit_product' p.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'manager:delete_product' p.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer">
+    <button class="btn btn-sm btn-danger" id="bulkDelete"><i class="bi bi-trash"></i> Delete selected</button>
+  </div>
+</div>
+{% endblock %}

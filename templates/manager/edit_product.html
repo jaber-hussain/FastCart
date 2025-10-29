@@ -1,0 +1,158 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+<section class="middle">
+  <div class="container-fluid">
+    <div class="row align-items-start justify-content-between">
+
+      <!-- Sidebar -->
+      {% include 'manager/sidebar.html' %}
+
+      <!-- Main Content -->
+      <div class="col-12 col-md-12 col-lg-8 col-xl-9">
+        <h4 class="mb-4 fw-bold">Edit Product: {{ product.name }}</h4>
+
+        <div class="card shadow-sm rounded mb-4">
+          <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <!-- Product Name -->
+              <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">Product Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+              </div>
+
+              <!-- Price -->
+              <div class="mb-3">
+                <label for="price" class="form-label fw-semibold">Price</label>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ product.price }}" required>
+              </div>
+
+              <!-- Regular Price -->
+              <div class="mb-3">
+                <label for="regular_price" class="form-label fw-semibold">Regular Price</label>
+                <input type="number" step="0.01" class="form-control" id="regular_price" name="regular_price" value="{{ product.regular_price }}">
+              </div>
+
+              <!-- Shipping -->
+              <div class="mb-3">
+                <label for="shipping" class="form-label fw-semibold">Shipping Cost</label>
+                <input type="number" step="0.01" class="form-control" id="shipping" name="shipping" value="{{ product.shipping }}">
+              </div>
+
+              <!-- Stock -->
+              <div class="mb-3">
+                <label for="stock" class="form-label fw-semibold">Stock</label>
+                <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" required>
+              </div>
+
+              <!-- Category -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Product Category</label>
+                <select name="category" class="form-select">
+                  <option value="">-------------</option>
+                  {% for c in categories %}
+                    <option value="{{ c.id }}" {% if product.category and c.id == product.category.id %} selected {% endif %}>{{ c.title }}</option>
+                  {% endfor %}
+                </select>
+                <small class="text-muted">Help people find your products by choosing categories that represent your product.</small>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-3">
+                <label for="description" class="form-label fw-semibold">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="5">{{ product.description }}</textarea>
+              </div>
+
+              <!-- Product Image -->
+              <div class="mb-3">
+                <label for="image" class="form-label fw-semibold">Main Product Image</label>
+                <input type="file" class="form-control" id="image" name="image">
+                {% if product.image %}
+                  <small class="text-muted">Current Image:</small><br/>
+                  <img src="{{ product.image.url }}" width="120" class="rounded mt-2" alt="{{ product.name }}">
+                {% endif %}
+              </div>
+
+              <!-- Gallery Images -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Gallery Images</label>
+                <input type="file" name="image_1" class="form-control mb-2">
+                <input type="file" name="image_2" class="form-control mb-2">
+                <input type="file" name="image_3" class="form-control mb-2">
+                <small class="text-muted">Add multiple gallery images (you can dynamically add fields via JS).</small>
+
+                <div class="mt-3 d-flex flex-wrap">
+                  {% for g in gallery_images %}
+                    <div class="position-relative me-2 mb-2" style="display:inline-block;">
+                      <img src="{{ g.image.url }}" width="100" class="rounded border" alt="Gallery image">
+                      <!-- Remove button -->
+                      <form method="POST" action="{% url 'manager:delete_gallery_image' g.id %}" style="position:absolute; top:0; right:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger p-1" 
+                                onclick="return confirm('Remove this image?');">
+                          ✕
+                        </button>
+                      </form>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Variants -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Product Variants</label>
+                <div id="variants-wrapper">
+                  {% for variant in variants %}
+                    <div class="border rounded p-3 mb-3 position-relative">
+                      <!-- Delete Variant Button -->
+                      <form method="POST" action="{% url 'manager:delete_variant' variant.id %}" 
+                            style="position:absolute; top:10px; right:10px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this variant and all its items?');">✕</button>
+                      </form>
+
+                      <input type="hidden" name="variant_id[]" value="{{ variant.id }}">
+                      <label class="fw-semibold">Variant Name</label>
+                      <input type="text" class="form-control mb-2" name="variant_title[]" value="{{ variant.name }}">
+
+                      <div class="ms-3">
+                        <label class="fw-semibold">Items</label>
+                        {% for item in variant.variantitem_set.all %}
+                          <div class="d-flex mb-2">
+                            <input type="hidden" name="item_id_{{ forloop.parentloop.counter0 }}[]" value="{{ item.id }}">
+                            <input type="text" class="form-control me-2" name="item_title_{{ forloop.parentloop.counter0 }}[]" value="{{ item.title }}" placeholder="Item title">
+                            <input type="text" class="form-control" name="item_description_{{ forloop.parentloop.counter0 }}[]" value="{{ item.content }}" placeholder="Item description">
+                          </div>
+                        {% endfor %}
+                        <!-- Empty row for adding new item -->
+                        <div class="d-flex mb-2">
+                          <input type="hidden" name="item_id_{{ forloop.counter0 }}[]" value="">
+                          <input type="text" class="form-control me-2" name="item_title_{{ forloop.counter0 }}[]" placeholder="Item title">
+                          <input type="text" class="form-control" name="item_description_{{ forloop.counter0 }}[]" placeholder="Item description">
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+                <small class="text-muted">Variants (like color, size) and their items (like red, blue for color).</small>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="mt-4">
+                <button type="submit" class="btn btn-success me-2">Save Changes</button>
+                <a href="{% url 'manager:manage_products' %}" class="btn btn-secondary">Cancel</a>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div> <!-- End Main Content -->
+
+    </div>
+  </div>
+</section>
+{% endblock content %}

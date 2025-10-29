@@ -1,0 +1,23 @@
+# ✅ Save cart_id in session only if not already stored
+    if 'cart_id' not in request.session:
+        request.session['cart_id'] = cart_id
+    else:
+        # Reuse the same ID if the frontend sent a different one accidentally
+        cart_id = request.session['cart_id']
+
+    # Validate essential fields
+    if not product_id or not quantity or not cart_id:
+        return JsonResponse({"error": "Missing required parameters"}, status=400)
+
+# Normalize color and size
+    color = color if color and color.lower() != "null" else None
+    size = size if size and size.lower() != "null" else None
+
+    has_color = product.variants.filter(name="Color").exists()
+    has_size = product.variants.filter(name="Size").exists()
+
+    if has_color and not color:
+        return JsonResponse({"error": "Please select a color"}, status=400)
+
+    if has_size and not size:
+        return JsonResponse({"error": "Please select a size"}, status=400)

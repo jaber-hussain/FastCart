@@ -1,0 +1,80 @@
+{% extends 'partials/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<section class="middle py-4">
+  <div class="container-fluid">
+    <div class="row g-0">
+      
+      <!-- Sidebar -->
+      {% include 'manager/sidebar.html' %}
+
+      <!-- Main Content -->
+      <div class="col-12 col-lg-9 ps-lg-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold text-primary m-0">
+            <i class="fas fa-store me-2"></i>Edit Vendor — {{ vendor.store_name }}
+          </h4>
+          <a href="{% url 'manager:manage_vendors' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Vendors
+          </a>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="card shadow-sm border-0 rounded-3">
+          <div class="card-body px-4 py-4">
+            <form method="POST" enctype="multipart/form-data" class="row g-3">
+              {% csrf_token %}
+              
+              {% for field in form %}
+              <div class="col-12">
+                <label for="{{ field.id_for_label }}" class="form-label fw-semibold small text-secondary">
+                  {{ field.label }}
+                </label>
+                {{ field|add_class:"form-control form-control-sm" }}
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+              {% endfor %}
+
+              <!-- Buttons -->
+              <div class="col-12 d-flex justify-content-end gap-2 pt-3 border-top">
+                <button type="submit" class="btn btn-primary px-4 py-2">
+                  <i class="fas fa-save me-2"></i>Update Vendor
+                </button>
+                <a href="{% url 'manager:manage_vendors' %}" class="btn btn-secondary px-4 py-2">
+                  <i class="fas fa-times me-2"></i>Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .card {
+    transition: box-shadow 0.25s ease-in-out;
+  }
+  .card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+  }
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+  }
+  .form-label {
+    margin-bottom: 0.25rem;
+  }
+  .card-body {
+    padding: 1.5rem 1.5rem;
+  }
+</style>
+{% endblock %}

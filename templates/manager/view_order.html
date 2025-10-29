@@ -1,0 +1,113 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<section class="middle">
+  <div class="container-fluid">
+    <div class="row align-items-start justify-content-between">
+
+      <!-- Sidebar -->
+      {% include 'manager/sidebar.html' %}
+
+      <!-- Main Content -->
+      <div class="col-12 col-md-12 col-lg-8 col-xl-9">
+        <div class="ord_list_wrap border mb-4 shadow-sm">
+
+          <!-- Header -->
+          <div class="ord_list_head bg-light bg-opacity-10 d-flex align-items-center justify-content-between px-3 py-3">
+            <div class="olh_flex">
+              <h6 class="mb-0 fw-bold">Order #{{ order.id }}</h6>
+              <small class="text-muted">
+                {{ order.customer_name|default:"Guest" }} — {{ order.customer_email }}
+              </small>
+            </div>
+            <div class="olh_flex">
+              <a href="{% url 'manager:edit_order' order.id %}" class="btn btn-sm bg-warning rounded text-white me-2">
+                <i class="fas fa-edit me-1"></i>Edit
+              </a>
+              <a href="{% url 'manager:manage_orders' %}" class="btn btn-sm bg-secondary rounded text-white">
+                <i class="fas fa-arrow-left me-1"></i>Back
+              </a>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="ord_list_body text-left p-4">
+            <!-- Order Summary -->
+            <h6 class="fw-bold text-secondary mb-3">Order Summary</h6>
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <p><strong>Total:</strong> ${{ order.total|floatformat:2 }}</p>
+                <p>
+                  <strong>Status:</strong> 
+                  <span class="badge 
+                    {% if order.status == 'Pending' %}bg-warning text-dark
+                    {% elif order.status == 'Shipped' %}bg-info text-dark
+                    {% elif order.status == 'Delivered' %}bg-success
+                    {% else %}bg-secondary{% endif %}">
+                    {{ order.status }}
+                  </span>
+                </p>
+                <p>
+                  <strong>Payment:</strong> 
+                  <span class="badge 
+                    {% if order.payment_status == 'Paid' %}bg-success
+                    {% elif order.payment_status == 'Failed' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ order.payment_status }}
+                  </span>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Placed On:</strong> {{ order.date|date:"M d, Y" }}</p>
+                <p><strong>Items:</strong> {{ order.items.count }}</p>
+              </div>
+            </div>
+
+            <!-- Order Items Table -->
+            <h6 class="fw-bold text-secondary mb-3">Items</h6>
+            {% if order.items.all %}
+              <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                      <th>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in order.items.all %}
+                      <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.price|floatformat:2 }}</td>
+                        <td>${{ item.subtotal|floatformat:2 }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted">No items in this order.</p>
+            {% endif %}
+          </div>
+
+          <!-- Footer -->
+          <div class="ord_list_footer d-flex align-items-center justify-content-between br-top px-3 py-3">
+            <div>
+              <p class="m-0">
+                <span class="text-muted medium">Grand Total: </span>
+                <span class="fw-bold">${{ order.total|floatformat:2 }}</span>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock content %}

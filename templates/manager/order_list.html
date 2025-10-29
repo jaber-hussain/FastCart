@@ -1,0 +1,56 @@
+{% extends 'manager/base.html' %}
+{% block title %}Orders{% endblock %}
+{% block bc %}
+  <li class="breadcrumb-item"><a href="{% url 'manager:manage_orders' %}">Orders</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong>Order Queue</strong>
+    <div class="d-flex gap-2">
+      <select class="form-select form-select-sm" id="statusFilter">
+        <option value="">All Statuses</option>
+        {% for val,label in status_choices %}
+          <option value="{{ val }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      <input class="form-control form-control-sm" id="searchInput" placeholder="Search #ID or customer">
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th><th>Customer</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="orderTableBody">
+        {% for o in orders %}
+        <tr>
+          <td><a href="{% url 'manager:view_order' o.order_id %}" class="fw-bold">#{{ o.order_id }}</a></td>
+          <td>{{ o.customer.profile.full_name }}</td>
+          <td>{{ o.date|date:"M d, Y" }}</td>
+          <td>${{ o.total|floatformat:2 }}</td>
+          <td><span class="badge bg-{{ o.payment_status|lower }}">{{ o.payment_status }}</span></td>
+          <td><span class="badge bg-info">{{ o.order_status }}</span></td>
+          <td>
+            <a href="{% url 'manager:edit_order' o.order_id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* live search (can be replaced with HTMX) */
+document.getElementById('searchInput').addEventListener('keyup', e => {
+  const rows = [...document.querySelectorAll('#orderTableBody tr')];
+  rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(e.target.value) ? '' : 'none');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<section class="middle">
+    <div class="container-fluid">
+        <div class="row align-items-start justify-content-between">
+
+            <!-- Sidebar -->
+            {% include 'manager/sidebar.html' %}
+
+            <!-- Main Content (Products) -->
+            <div class="col-12 col-md-12 col-lg-8 col-xl-9">
+                <h4 class="mb-0 mb-4 fw-bold">Products ({{products_list.count}})</h4>
+
+                {% for product in products %}
+                    <div class="ord_list_wrap border mb-4 mfliud">
+                        <div class="ord_list_head bg-light bg-opacity-10 d-flex align-items-center justify-content-between px-3 py-3">
+                            <div class="olh_flex">
+                                <h6 class="mb-0 ft-medium">{{ product.name }}</h6>
+                            </div>
+                            <div class="olh_flex">
+                                <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-sm bg-primary rounded text-white me-1">
+                                    View
+                                </a>
+                                <a href="{% url 'manager:edit_product' product.id %}" class="btn btn-sm bg-warning rounded text-white me-1">
+                                    Edit
+                                </a>
+                                <a href="{% url 'manager:delete_product' product.id %}" class="btn btn-sm bg-danger rounded text-white" 
+                                   onclick="return confirm('Are you sure you want to delete this product?');">
+                                    Delete
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="ord_list_body text-left">
+                            <div class="row align-items-center justify-content-center m-0 py-4 br-bottom">
+                                <div class="col-xl-6 col-lg-5 col-md-5 col-12">
+                                    <div class="cart_single d-flex align-items-start mfliud-bot gap-3">
+                                        <div class="cart_selected_single_thumb">
+                                            <a href="{% url 'store:product_detail' product.slug %}">
+                                                <img src="{{ product.image.url }}" width="75" class="img-fluid rounded" alt="{{ product.name }}" />
+                                            </a>
+                                        </div>
+                                        <div class="cart_single_caption pl-3">
+                                            <h4 class="product_title fs-sm ft-medium mb-1 lh-1">
+                                                <a href="{% url 'store:product_detail' product.slug %}">{{ product.name }}</a>
+                                            </h4>
+                                            <p class="mb-2">
+                                                <span class="text-dark medium">Vendor: {{ product.vendor.profile.full_name }}</span>
+                                                {% if product.color %}
+                                                    <br/><span class="text-dark medium">Color: {{ product.color }}</span>
+                                                {% endif %}
+                                                {% if product.size %}
+                                                    <br/><span class="text-dark medium">Size: {{ product.size }}</span>
+                                                {% endif %}
+                                            </p>
+                                            <h4 class="fs-sm ft-bold mb-0 lh-1">${{ product.price|floatformat:2 }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-3 col-md-3 col-6">
+                                    <p class="mb-1 p-0"><span class="text-muted">Category</span></p>
+                                    <h6 class="mb-0 ft-medium fs-sm">{{ product.category.name }}</h6>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-4 col-6">
+                                    <p class="mb-1 p-0"><span class="text-muted">Stock</span></p>
+                                    <h6 class="mb-0 ft-medium fs-sm">{{ product.stock }}</h6>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-4 col-6">
+                                    <p class="mb-1 p-0"><span class="text-muted">Created At</span></p>
+                                    <h6 class="mb-0 ft-medium fs-sm">{{ product.created_at|date:"M d, Y" }}</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ord_list_footer d-flex align-items-center justify-content-between br-top px-3">
+                            <div class="col-xl-12 pr-0 py-2 olf_flex d-flex align-items-center justify-content-between">
+                                <div class="olf_flex_inner hide_mob">
+                                    <p class="m-0 p-0"><span class="text-muted medium">Price: ${{ product.price|floatformat:2 }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No products yet</p>
+                {% endfor %}
+
+                <!-- Pagination -->
+                <ul class="pagination">
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                        <li class="page-item {% if products.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+
+            </div> <!-- End Main Content -->
+        </div>
+    </div>
+</section>
+{% endblock content %}

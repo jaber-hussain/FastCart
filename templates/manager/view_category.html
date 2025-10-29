@@ -1,0 +1,85 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="middle py-4">
+  <div class="container-fluid">
+    <div class="row g-0">
+
+      <!-- Sidebar -->
+      {% include 'manager/sidebar.html' %}
+
+      <!-- Main Content -->
+      <div class="col-12 col-lg-9 ps-lg-4">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+          <h4 class="fw-bold text-primary mb-0">
+            <i class="bi bi-tags-fill me-2 text-secondary"></i>{{ category.title }}
+          </h4>
+          <span class="badge rounded-pill bg-light text-dark border">
+            {{ products|length }} Product{% if products|length != 1 %}s{% endif %}
+          </span>
+        </div>
+
+        {% if products %}
+        <!-- Product Grid -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+          {% for product in products %}
+          <div class="col">
+            <div class="card shadow-sm border-0 hover-shadow transition" style="max-width: 200px; margin:auto;">
+              <a href="{% url 'store:product_detail' product.slug %}">
+                <img 
+                  src="{{ product.image.url|default:'/static/images/placeholder.png' }}" 
+                  alt="{{ product.title }}" 
+                  class="card-img-top rounded-top"
+                  style="height: 140px; object-fit: cover;"
+                >
+              </a>
+              <div class="card-body text-center p-2">
+                <h6 class="fw-semibold text-truncate mb-1" style="font-size: 0.85rem;">
+                  <a href="{% url 'store:product_detail' product.slug %}" class="text-dark text-decoration-none">
+                    {{ product.title }}
+                  </a>
+                </h6>
+                <p class="fw-bold text-success mb-1" style="font-size: 0.8rem;">
+                  ${{ product.price }}
+                </p>
+                <a href="{% url 'store:product_detail' product.slug %}" 
+                   class="btn btn-sm btn-outline-primary rounded-pill px-2 py-0">
+                  View
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <img src="{% static 'images/empty-box.svg' %}" alt="No Products" style="max-width:100px;" class="mb-3">
+          <h6 class="text-muted">No products found in this category.</h6>
+        </div>
+        {% endif %}
+
+        <div class="mt-4">
+          <a href="{% url 'manager:manage_categories' %}" 
+             class="btn btn-outline-secondary rounded-pill px-4">
+            ← Back to Categories
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hover-shadow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+  .transition {
+    transition: all 0.2s ease-in-out;
+  }
+</style>
+
+{% endblock content %}

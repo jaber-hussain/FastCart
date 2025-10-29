@@ -1,0 +1,125 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+<section class="middle py-4">
+  <div class="container-fluid">
+    <div class="row g-0">
+      <!-- Sidebar -->
+      {% include 'manager/sidebar.html' %}
+
+      <!-- Main Content -->
+      <div class="col-12 col-lg-9 ps-lg-4">
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 border-bottom pb-2">
+          <h4 class="fw-bold text-primary mb-2">
+            <i class="fas fa-store me-2"></i>Vendor Details — {{ vendor.store_name }}
+          </h4>
+          <a href="{% url 'manager:manage_vendors' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Vendors
+          </a>
+        </div>
+
+        <!-- Vendor Card -->
+        <!-- Vendor Details Card -->
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+  <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4">
+    <div class="text-center flex-shrink-0">
+      <img src="{{ vendor.image.url }}" alt="{{ vendor.store_name }}"
+           class="rounded-circle border shadow-sm vendor-img">
+    </div>
+
+    <div class="flex-grow-1 w-100">
+      <h5 class="fw-bold mb-3">{{ vendor.store_name }}</h5>
+      <div class="row gy-2">
+        <div class="col-sm-4">
+          <p class="mb-1 text-muted small">Country</p>
+          <p class="fw-semibold">{{ vendor.country|default:"N/A" }}</p>
+        </div>
+        <div class="col-sm-4">
+          <p class="mb-1 text-muted small">Date Added</p>
+          <p class="fw-semibold">{{ vendor.date|date:"M d, Y" }}</p>
+        </div>
+        <div class="col-sm-4">
+          <p class="mb-1 text-muted small">Total Vendor Sales</p>
+          <p class="fw-bold text-success">${{ total_vendor_sales|floatformat:2 }}</p>
+        </div>
+      </div>
+      <div class="mt-3">
+        <a href="{% url 'manager:edit_vendor' vendor.id %}" class="btn btn-warning btn-sm me-2 px-3">
+          <i class="fas fa-edit me-1"></i>Edit
+        </a>
+        <a href="{% url 'manager:manage_vendors' %}" class="btn btn-secondary btn-sm px-3">
+          <i class="fas fa-list me-1"></i>Back
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Vendor Products Table -->
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-header bg-light fw-semibold">
+    <i class="fas fa-box-open me-2 text-primary"></i>Products by {{ vendor.store_name }}
+  </div>
+  <div class="card-body p-0">
+    {% if products %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Sales</th>
+            <th>Date Added</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in products %}
+<tr>
+  <td><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:50px;height:50px;"></td>
+  <td>{{ item.product.name }}</td>
+  <td>{{ item.product.category.name|default:"-" }}</td>
+  <td>${{ item.product.price }}</td>
+  <td>${{ item.sales }}</td>
+</tr>
+{% endfor %}
+<p class="fw-bold mt-3">Total Vendor Sales: ${{ total_vendor_sales }}</p>
+}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="p-4 text-center text-muted">
+      <i class="fas fa-info-circle me-1"></i>No products found for this vendor.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vendor-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+  }
+  .card {
+    transition: box-shadow 0.25s ease-in-out, transform 0.2s;
+  }
+  .card:hover {
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+  .table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+</style>
+{% endblock %}

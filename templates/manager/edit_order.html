@@ -1,0 +1,104 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<section class="middle">
+    <div class="container-fluid">
+        <div class="row align-items-start justify-content-between">
+
+            <!-- Sidebar -->
+            {% include 'manager/sidebar.html' %}
+
+            <!-- Main Content -->
+            <div class="col-12 col-md-12 col-lg-8 col-xl-9">
+
+                <h4 class="mb-4 fw-bold">Edit Order - {{ order.order_id }}</h4>
+
+                <form method="POST" class="border p-4 rounded bg-light">
+                    {% csrf_token %}
+
+                    <!-- Payment Status -->
+                    <div class="mb-3">
+                        <label class="form-label fw-medium text-muted">Payment Status</label>
+                        <select class="form-select" name="payment_status">
+                            {% for value, label in PAYMENT_STATUS %}
+                                <option value="{{ value }}" {% if order.payment_status == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-3">
+                        <label class="form-label fw-medium text-muted">Payment Method</label>
+                        <select class="form-select" name="payment_method">
+                            {% for value, label in PAYMENT_METHOD %}
+                                <option value="{{ value }}" {% if order.payment_method == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Order Status -->
+                    <div class="mb-4">
+                        <label class="form-label fw-medium text-muted">Order Status</label>
+                        <select class="form-select" name="order_status">
+                            {% for value, label in ORDER_STATUS %}
+                                <option value="{{ value }}" {% if order.order_status == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Order Items Table -->
+                    <h5 class="fw-bold mb-3">Order Items</h5>
+                    {% if order_items %}
+                        <div class="table-responsive mb-3">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Product</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order_items %}
+                                    <tr>
+                                        <td class="fw-medium">
+                                            {% if item.product %}
+                                                {{ item.product.name }}
+                                            {% else %}
+                                                {{ item }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>
+                                            {% if item.subtotal %}
+                                                ${{ item.subtotal|floatformat:2 }}
+                                            {% elif item.get_subtotal %}
+                                                ${{ item.get_subtotal|floatformat:2 }}
+                                            {% else %}
+                                                –
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No items found for this order.</p>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+                </form>
+
+            </div> <!-- End Main Content -->
+        </div>
+    </div>
+</section>
+{% endblock %}

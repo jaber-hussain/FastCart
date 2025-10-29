@@ -1,0 +1,137 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+<section class="middle">
+  <div class="container-fluid">
+    <div class="row align-items-start justify-content-between">
+
+      {% include 'manager/sidebar.html' %}
+
+      <div class="col-12 col-lg-9">
+        <div class="card shadow-sm border-0">
+
+          <!-- Header -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold">Manage Vendors</h4>
+            <a href="{% url 'manager:add_vendor' %}" class="btn btn-primary">Add Vendor</a>
+          </div>
+
+          <!-- Search / Filter (optional – works on both tables) -->
+          <div class="card-body pb-0">
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <input type="text" id="searchVendor" class="form-control" placeholder="Search by store name or country...">
+              </div>
+              <div class="col-md-3">
+                <select id="filterCountry" class="form-select">
+                  <option value="">Filter by Country</option>
+                  {% for country in countries %}
+                    <option value="{{ country }}">{{ country }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3 text-end">
+                <small class="text-muted">
+                  Pending: <span id="pendingCount">{{ pending|length }}</span> |
+                  Approved: <span id="approvedCount">{{ approved|length }}</span>
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- ##########  PENDING APPROVAL  ########## -->
+          {% if pending %}
+          <h5 class="text-warning mb-3 mt-4">
+            <i class="fas fa-clock me-2"></i>Pending Approval
+            <span class="badge bg-warning text-dark ms-2">{{ pending|length }}</span>
+          </h5>
+          <div class="table-responsive mb-5">
+            <table class="table table-hover align-middle mb-0" id="pendingTable">
+              <thead class="table-light">
+                <tr>
+                  <th>Image</th><th>Store Name</th><th>Country</th><th>Date</th><th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vendor in pending %}
+                <tr>
+                  <td><img src="{{ vendor.image.url }}" class="rounded-circle border" width="45" height="45" alt=""></td>
+                  <td class="fw-semibold">{{ vendor.store_name }}</td>
+                  <td>{{ vendor.country|default:"N/A" }}</td>
+                  <td>{{ vendor.date|date:"M d, Y" }}</td>
+                  <td class="text-center">
+                    
+                    <form action="{% url 'manager:approve_vendor' vendor.id %}" method="post" class="d-inline">{% csrf_token %}
+                      <button class="btn btn-sm btn-success">Approve</button>
+                    </form>
+                    <form action="{% url 'manager:reject_vendor' vendor.id %}" method="post" class="d-inline" onsubmit="return confirm('Reject this vendor?');">{% csrf_token %}
+                      <button class="btn btn-sm btn-outline-danger">Reject</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+
+          <!-- ##########  APPROVED VENDORS  ########## -->
+          <h5 class="text-success mb-3">
+            <i class="fas fa-check-circle me-2"></i>Approved Vendors
+            <span class="badge bg-success ms-2">{{ approved|length }}</span>
+          </h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="approvedTable">
+              <thead class="table-dark">
+                <tr>
+                  <th>Image</th><th>Store Name</th><th>Country</th><th>Date</th><th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vendor in approved %}
+                <tr>
+                  <td><img src="{{ vendor.image.url }}" class="rounded-circle border" width="45" height="45" alt=""></td>
+                  <td class="fw-semibold">{{ vendor.store_name }}</td>
+                  <td>{{ vendor.country|default:"N/A" }}</td>
+                  <td>{{ vendor.date|date:"M d, Y" }}</td>
+                  <td class="text-center">
+                    <a href="{% url 'manager:view_vendor' vendor.id %}" class="btn btn-sm btn-outline-info me-1" title="View"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'manager:edit_vendor' vendor.id %}" class="btn btn-sm btn-outline-warning me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                    <form action="{% url 'manager:delete_vendor' vendor_id=vendor.id %}" method="post" class="d-inline" onsubmit="return confirm('Delete this vendor?');">{% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No approved vendors.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- simple live-search for both tables -->
+<script>
+  function liveSearch(boxId, tableId, countId){
+    const box   = document.getElementById(boxId);
+    const table = document.getElementById(tableId);
+    const count = document.getElementById(countId);
+    box.addEventListener('input', () => {
+      let visible = 0, val = box.value.toLowerCase();
+      [...table.tBodies[0].rows].forEach(r => {
+        const match = r.textContent.toLowerCase().includes(val);
+        r.style.display = match ? "" : "none";
+        if(match) visible++;
+      });
+      count.textContent = visible;
+    });
+  }
+  liveSearch('searchVendor', 'pendingTable',  'pendingCount');
+  liveSearch('searchVendor', 'approvedTable', 'approvedCount');
+</script>
+{% endblock %}

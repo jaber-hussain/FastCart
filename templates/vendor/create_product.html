@@ -1,0 +1,163 @@
+{% extends 'vendor/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<section class="middle">
+  <div class="container-fluid">
+    <div class="row align-items-start justify-content-between">
+      {% include 'vendor/sidebar.html' %}
+
+      <div class="col-12 col-md-12 col-lg-9 col-xl-10">
+        <h4 class="mb-0 mb-4 fw-bold">Create Product</h4>
+        <div class="card border-0 shadow mb-4">
+          <div class="card-body">
+            <form class="pb-8 mt-2" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="card border-0 mb-3">
+                <div class="card-header border-0 px-4 py-3 rounded">
+                  <h4 class="mb-0">Basic Information</h4>
+                </div>
+                <div class="card-body border-0">
+
+                  <!-- Image Preview -->
+                  <div class="text-center d-flex justify-content-center align-items-center mb-3">
+                    <img id="imagePreview" src="" alt="Preview" style="width:100%;height:500px;object-fit:cover;border-radius:10px;display:none;">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Product Thumbnail</label>
+                    <input name="image" id="imageInput" class="form-control rounded" type="file" accept="image/*" onchange="previewImage(event)">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input name="name" class="form-control rounded" type="text" placeholder="">
+                    <small>Write a 60 character product title.</small>
+                  </div>
+
+                  <!-- Category Section -->
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label class="form-label fw-bold mb-0">Product Category</label>
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                        + Add New Category
+                      </button>
+                    </div>
+
+                    <select name="category_id" class="form-select" id="categorySelect" required>
+                      <option value="">-- Select a Category --</option>
+                      {% for c in categories %}
+                        <option value="{{ c.id }}">{{ c.title }}</option>
+                      {% endfor %}
+                    </select>
+                    <small class="text-muted">Help people find your products by choosing categories that best represent your product.</small>
+                  </div>
+
+                  <!-- Modal -->
+                  <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="categoryModalLabel">Add New Category</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label">Category Title</label>
+                            <input type="text" id="newCategoryTitle" class="form-control" placeholder="Enter category name">
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button type="button" class="btn btn-primary" id="saveCategoryBtn">Create</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Other fields -->
+                  <div class="mb-3">
+                    <label class="form-label">Product Description</label>
+                    <textarea name="description" class="form-control rounded" rows="6"></textarea>
+                    <small>A brief summary of your product.</small>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Regular Price</label>
+                    <input name="regular_price" class="form-control rounded" type="number" placeholder="$20.99">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Sale Price</label>
+                    <input name="price" class="form-control rounded" type="number" placeholder="$8.70">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Shipping Fee</label>
+                    <input name="shipping" class="form-control rounded" type="number" placeholder="Shipping fee">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Stock</label>
+                    <input name="stock" class="form-control rounded" type="number" placeholder="Stock Count">
+                  </div>
+
+                </div>
+              </div>
+              <button class="btn btn-lg bg-primary rounded text-white w-100 mt-2" type="submit">
+                Continue <i class="fas fa-arrow-right"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function previewImage(event) {
+  const imageInput = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function() {
+    const preview = document.getElementById('imagePreview');
+    preview.src = reader.result;
+    preview.style.display = 'block';
+  }
+  if (imageInput) {
+    reader.readAsDataURL(imageInput);
+  }
+}
+
+// AJAX Category Creation
+document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+  const title = document.getElementById('newCategoryTitle').value.trim();
+  if (!title) {
+    alert('Enter a category name');
+    return;
+  }
+  fetch("{% url 'vendor:create_category_ajax' %}", {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({ title })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      const select = document.getElementById('categorySelect');
+      const option = new Option(data.title, data.id, true, true);
+      select.add(option);
+      document.getElementById('newCategoryTitle').value = '';
+      const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+      modal.hide();
+    } else {
+      alert(data.error || 'Failed to create category');
+    }
+  })
+  .catch(() => alert('Error creating category'));
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends "vendor/base.html" %}
+{% block content %}
+  <h2>Categories</h2>
+  <a class="btn btn-success mb-3" href="{% url 'vendor:create_category' %}">+ New</a>
+  <table class="table table-bordered">
+    <thead><tr><th>Title</th><th>Image</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for c in categories %}
+      <tr>
+        <td>{{ c.title }}</td>
+        <td>{% if c.image %}<img src="{{ c.image.url }}" width="60">{% endif %}</td>
+        <td>
+          <a href="{% url 'vendor:update_category' c.id %}" class="btn btn-sm btn-warning">Edit</a>
+          <form method="post" action="{% url 'vendor:delete_category' c.id %}" class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Del</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

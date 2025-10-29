@@ -1,0 +1,6 @@
+Hi {{ order.address.full_name }},
+
+Thank you for your order {{ order.order_id }}!
+We'll notify you when it's shipped.
+
+- FastCart Team

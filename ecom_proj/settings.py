@@ -37,7 +37,7 @@ SECRET_KEY = 'django-insecure-*w=z=o0r&a*&!ls4cq(5@$#5@iok4dg3ji^afzc4e8pqmzto(m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['fastcart.up.railway.app']
 
 
 # Application definition

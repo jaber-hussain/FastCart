@@ -107,3 +107,4 @@ urllib3==1.26.17
 whitenoise==5.2.0
 django-extensions
 razorpay
+django-widget-tweaks

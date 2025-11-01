@@ -39,6 +39,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['fastcart.up.railway.app']
 
+CSRF_TRUSTED_ORIGINS=['fastcart.up.railway.app']
+
 
 # Application definition
 

@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from environ import Env
+from dotenv import load_dotenv
 from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,9 +22,9 @@ env = Env()
 
 env_file = BASE_DIR / ".env"
 if env_file.exists():
-    env.read_env(str(env_file))
+    load_dotenv(env_file)
 else:
-    raise FileNotFoundError(f".env not found at {env_file}")
+    print(f"⚠️ Warning: .env not found at {env_file}, using environment variables from host")
 
 
 # Quick-start development settings - unsuitable for production

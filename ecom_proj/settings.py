@@ -115,12 +115,16 @@ DATABASES = {
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 #EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="anymail.backends.mailgun.EmailBackend")
+
 ANYMAIL = {
     "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
     "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
 }
 
-DEFAULT_FROM_EMAIL = 'FastCart <postmaster@sandboxc65222e81db84e61b410bd12d23a5328.mailgun.org>'
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+FROM_EMAIL = env("FROM_EMAIL", default=DEFAULT_FROM_EMAIL)
 
 
 # Password validation
@@ -160,7 +164,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -184,8 +188,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
-RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
+RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_PUBLIC_KEY", default="")
+RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_PRIVATE_KEY", default="")
 
 customColorPalette = [
     {"color": "hsl(4, 90%, 58%)", "label": "Red"},

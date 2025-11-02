@@ -23,7 +23,6 @@ env = Env()
 env_file = BASE_DIR / ".env"
 if env_file.exists():
     env.read_env(str(env_file))
-    print("Loaded MAILGUN_API_KEY:", env("MAILGUN_API_KEY", default="NOT FOUND"))
 else:
     raise FileNotFoundError(f".env not found at {env_file}")
 
@@ -32,14 +31,14 @@ else:
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*w=z=o0r&a*&!ls4cq(5@$#5@iok4dg3ji^afzc4e8pqmzto(m'
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = ['fastcart.up.railway.app']
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
-CSRF_TRUSTED_ORIGINS = ['https://fastcart.up.railway.app']
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["http://localhost", "https://fastcart.up.railway.app"])
 
 
 # Application definition

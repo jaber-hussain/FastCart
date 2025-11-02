@@ -29,10 +29,10 @@ else:
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG", default=False)
+DEBUG = os.getenv("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
@@ -113,16 +113,16 @@ DATABASES = {
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 #EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-EMAIL_BACKEND = env("EMAIL_BACKEND", default="anymail.backends.mailgun.EmailBackend")
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", default="anymail.backends.mailgun.EmailBackend")
 
 ANYMAIL = {
-    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
+    "MAILGUN_API_KEY": os.getenv("MAILGUN_API_KEY"),
+    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),
 }
 
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
-FROM_EMAIL = env("FROM_EMAIL", default=DEFAULT_FROM_EMAIL)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+FROM_EMAIL = os.getenv("FROM_EMAIL", default=DEFAULT_FROM_EMAIL)
 
 
 # Password validation
@@ -186,8 +186,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_PUBLIC_KEY", default="")
-RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_PRIVATE_KEY", default="")
+RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY", default="")
+RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY", default="")
 
 customColorPalette = [
     {"color": "hsl(4, 90%, 58%)", "label": "Red"},

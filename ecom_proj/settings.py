@@ -32,11 +32,11 @@ else:
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", default=False)
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["http://localhost", "https://fastcart.up.railway.app"])
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost,https://fastcart.up.railway.app").split(",")
 
 
 # Application definition
@@ -112,14 +112,11 @@ DATABASES = {
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 #EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", default="anymail.backends.mailgun.EmailBackend")
-
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "anymail.backends.mailgun.EmailBackend")
 ANYMAIL = {
     "MAILGUN_API_KEY": os.getenv("MAILGUN_API_KEY"),
     "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),
 }
-
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 SERVER_EMAIL = os.getenv("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 FROM_EMAIL = os.getenv("FROM_EMAIL", default=DEFAULT_FROM_EMAIL)

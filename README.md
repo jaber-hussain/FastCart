@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Django](https://img.shields.io/badge/Django-4.x-092E20?style=flat-square&logo=django&logoColor=white)](https://djangoproject.com)
 [![Celery](https://img.shields.io/badge/Celery-Async_Tasks-37814A?style=flat-square&logo=celery&logoColor=white)](https://docs.celeryq.dev)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)]()
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://opensource.org/licenses/MIT)
 
 > FastCart is a full-featured multi-vendor ecommerce web platform where multiple vendors can register, manage their stores, and sell products - while customers shop, track orders, and manage their accounts.
 
